@@ -8,55 +8,91 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { BlurView } from 'expo-blur';
 import HeaderAddButton from './components/header-add-button';
+import { createStackNavigator } from '@react-navigation/stack';
+import ManageExpenseScreen from './screens/manage-expense-screen';
 
 export default function App() {
+  const stack = createStackNavigator();
   const bottomTab = createBottomTabNavigator();
 
+  const TabsOverview = () =>(
+    <bottomTab.Navigator 
+      screenOptions={{
+        tabBarActiveTintColor: "#FEBA17",
+        tabBarInactiveTintColor: "white",
+        tabBarStyle: {
+          backgroundColor: "#4D55CC",
+        },
+        headerTitleStyle: {
+          color: "white"
+        },
+        headerRight: () => (
+          <HeaderAddButton />
+        ),
+        headerStyle: {
+          backgroundColor: "#4D55CC"
+        },
+        sceneStyle: {
+          backgroundColor: "#4335A7"
+        }
+      }}
+    >
+      <bottomTab.Screen 
+        component={RecentExpensesScreen}
+        name='recentExpenses'
+        options={{
+          title: "Recent Expenses",
+          tabBarIcon: ({color, size}) =>(
+            <MaterialCommunityIcons name="timer-sand" size={size} color={color} />
+          )
+        }}
+      />
+
+      <bottomTab.Screen 
+        component={AllExpensesScreen}
+        name='allExpenses'
+        options={{
+          title: "All Expenses",
+          tabBarIcon: ({color, size}) =>(
+            <Ionicons name="calendar-outline" size={size} color={color} />
+          )
+        }}
+      />
+    </bottomTab.Navigator>
+  )
+
   return (
+    <>
+    <StatusBar style='light'/>
     <NavigationContainer>
-      <bottomTab.Navigator 
+      <stack.Navigator 
         screenOptions={{
-          tabBarActiveTintColor: "#FEBA17",
-          tabBarInactiveTintColor: "white",
-          tabBarStyle: {
-            backgroundColor: "#4D55CC",
-          },
           headerTitleStyle: {
             color: "white"
           },
-          headerRight: () => (
-            <HeaderAddButton />
-          ),
           headerStyle: {
             backgroundColor: "#4D55CC"
           },
-          sceneStyle: {
-            backgroundColor: "#4335A7"
-          }
         }}
       >
-        <bottomTab.Screen 
-          component={RecentExpensesScreen}
-          name='recentExpenses'
+        <stack.Screen 
+          name='expense-overview'
           options={{
-            title: "Recent Expenses",
-            tabBarIcon: ({color, size}) =>(
-              <MaterialCommunityIcons name="timer-sand" size={size} color={color} />
-            )
+            headerShown:false,
           }}
+          component={TabsOverview}
         />
 
-        <bottomTab.Screen 
-          component={AllExpensesScreen}
-          name='allExpenses'
+        <stack.Screen 
+          name='manage-expense'
+          component={ManageExpenseScreen}
           options={{
-            title: "All Expenses",
-            tabBarIcon: ({color, size}) =>(
-              <Ionicons name="calendar-outline" size={size} color={color} />
-            )
+            presentation: "modal",
+            title: "Manage Expense"
           }}
         />
-      </bottomTab.Navigator>
+      </stack.Navigator>
     </NavigationContainer>
+    </>
   );
 }

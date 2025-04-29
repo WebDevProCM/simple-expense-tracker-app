@@ -3,7 +3,7 @@ import React from 'react'
 
 interface TotalExpenseProps{
     title: string;
-    total: string
+    total: number;
 }
 
 const TotalExpense = ({title, total}: TotalExpenseProps) => {
