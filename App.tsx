@@ -10,6 +10,8 @@ import { BlurView } from 'expo-blur';
 import HeaderAddButton from './components/header-add-button';
 import { createStackNavigator } from '@react-navigation/stack';
 import ManageExpenseScreen from './screens/manage-expense-screen';
+import { Provider } from 'react-redux';
+import store from './store/store';
 
 export default function App() {
   const stack = createStackNavigator();
@@ -63,6 +65,7 @@ export default function App() {
 
   return (
     <>
+    <Provider store={store}>
     <StatusBar style='light'/>
     <NavigationContainer>
       <stack.Navigator 
@@ -87,12 +90,16 @@ export default function App() {
           name='manage-expense'
           component={ManageExpenseScreen}
           options={{
+            cardStyle: {
+              backgroundColor: "#4335A7"
+            },
             presentation: "modal",
             title: "Manage Expense"
           }}
         />
       </stack.Navigator>
     </NavigationContainer>
+    </Provider>
     </>
   );
 }

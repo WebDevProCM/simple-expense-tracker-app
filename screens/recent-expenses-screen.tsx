@@ -3,18 +3,19 @@ import React from 'react'
 import TotalExpense from '../components/total-expense'
 import Expense from '../components/expense'
 import ExpensesList from '../components/expenses-list'
-import { dummyData } from '../data/expenses-data'
+import { useAppDispatch, useAppSelector } from '../store/hook'
 
 const RecentExpensesScreen = () => {
+  const expenses = useAppSelector((state) => state.expenseSlice);
+  
   let total = 0;
-  const recentExpenses = dummyData.filter((item) => {
+  const recentExpenses = expenses.filter((item) => {
     const now = new Date();
     const sevenDaysAgo = new Date(new Date().setDate(now.getDate() - 7));
-    return item.date.getDate() > sevenDaysAgo.getDate();
+    return new Date(item.date).getDate() <= sevenDaysAgo.getDate();
   })
-
+  
   recentExpenses.forEach((item) => (total += item.amount))
-
   return (
     <View style={styleSheet.rootContainer}>
       <TotalExpense title='Recent 7 days' total={total}/>

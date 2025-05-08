@@ -7,7 +7,7 @@ const HeaderAddButton = () => {
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
 
   const pressHandler = () =>{
-    navigation.navigate("manage-expense");
+    navigation.navigate("manage-expense", {add:true, id:null});
   }
 
   return (
