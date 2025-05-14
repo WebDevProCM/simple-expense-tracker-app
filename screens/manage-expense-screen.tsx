@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { NavigationProp, ParamListBase, RouteProp, useNavigation, useRoute } from '@react-navigation/native'
 import { useAppDispatch, useAppSelector } from '../store/hook';
 import { addExpense, removeExpense, updateExpense } from '../store/expenses-slice';
+import Form from '../components/form';
 
 
 const ManageExpenseScreen = () => {
@@ -10,6 +11,8 @@ const ManageExpenseScreen = () => {
   const expenses = useAppSelector((state) => state.expenseSlice);
   const [enteredValue, setEnteredValue] = useState(0);
   const [enteredText, setEnteredText] = useState("");
+  const [enteredDate, setEnteredDate] = useState("");
+  const [errors, setErrors] = useState({});
   const route = useRoute<RouteProp<{params: {add?:boolean, id?:string|number}}, 'params'>>();
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
 
@@ -23,12 +26,21 @@ const ManageExpenseScreen = () => {
   }
 
   const addUpdateHandler = () => {
+    if(enteredText.length < 1 || enteredValue == 0 || new Date(enteredDate).toString() === "Invalid Date"){
+      setErrors({
+        value: enteredValue == 0 ? "Please enter a value greater than 0" : "",
+        text: enteredText.length< 1 ? "Please enter valid description" : "",
+        date: new Date(enteredDate).toString() === "Invalid Date" ? "Please enter valid date" : ""
+      })
+      return;
+    }
+
     if(add){
-      dispatch(addExpense({title: enteredText, amount: enteredValue}));
+      dispatch(addExpense({title: enteredText, amount: enteredValue, date:enteredDate}));
       navigation.goBack();
       return;
     }else{
-      dispatch(updateExpense({id: id,title:enteredText, amount: enteredValue}));
+      dispatch(updateExpense({id: id,title:enteredText, amount: enteredValue, date:enteredDate}));
       navigation.goBack();
     }
   }
@@ -42,31 +54,22 @@ const ManageExpenseScreen = () => {
     if(!add){
       const data = expenses.find((expense) => expense.id === id);
       setEnteredValue(data?.amount || 0);
-      setEnteredText(data?.title || "");
+      setEnteredText(data?.title || "Description");
+      setEnteredDate(data?.date.toISOString() || "YYYY-MM-DD");
     }
   }, [])
 
   return (
     <View style={styleSheet.rootContainer}>
-      <View style={styleSheet.inputcontainer}>
-        <TextInput 
-          style={styleSheet.valueInput}
-          value={enteredValue.toString()}
-          onChangeText={enteredValueHandler}
-          keyboardType='number-pad'
-          autoCorrect={false}
-          autoCapitalize="none"
-        />
-
-        <TextInput 
-          style={styleSheet.textInput}
-          value={enteredText}
-          onChangeText={setEnteredText}
-          autoCorrect={true}
-          autoCapitalize="none"
-        />
-        
-      </View>
+      <Form 
+        enteredValue={enteredValue}
+        enteredValueHandler={enteredValueHandler}
+        enteredText={enteredText}
+        setEnteredText={setEnteredText}
+        enteredDate={enteredDate}
+        setEnteredDate={setEnteredDate}
+        errors={errors}
+      />
       <Pressable onPress={addUpdateHandler} style={styleSheet.button} android_ripple={{color: "#4D55CC"}}>
         <Text style={styleSheet.buttonText}>{add ? "Add" : "Update"}</Text>
       </Pressable>
@@ -119,7 +122,7 @@ const styleSheet = StyleSheet.create({
     paddingHorizontal: 120,
     borderRadius: 10,
     elevation: 5,
-    marginBottom: 10
+    marginVertical: 10
   },
   buttonText:{
     color: "white",
